@@ -1,11 +1,15 @@
 module main(
-    ...
+    input CLOCK_50,
 );
 
     [15:0] keys = keyboard_reader()
     tone_player(keys)
 
-    game_clock // Clock controlling game progression
+	 // Clock controlling game progression
+	 wire game_clock;
+    period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(500), .new_clk(game_clock));
+	 
+	 
     game_frame // init: 0 ; game_frame += 1 ON game_clock posedge
     game_map // Row = individual note
         // 16 bit : ****----######## : * = note identifier, - = how long, # = when it starts
