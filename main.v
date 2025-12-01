@@ -1,6 +1,7 @@
 module main(
 	input CLOCK_50, input [3:0] GPIO_1, 
-	inout [4:0] GPIO_0
+	inout [4:0] GPIO_0,
+	output [9:9] LEDR
 );
 	//
 	//INPUT SIDE
@@ -14,13 +15,13 @@ module main(
 	//INTERNALS
 	//
 	
-	/*
 	// Clock controlling game progression - 0.5 for now, perhaps this should be changed *shrug*
-	reg game_clock;
-	period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(500), .new_clk(game_clock));
+	wire game_clock;
+	period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(500), .new_clk(game_clock)); 
 
 	// Counter keeping track of what game frame we're currently in
-	reg [7:0] game_frame;
+	// NOTE: 8 bits, so maxes at 255
+	wire [7:0] game_frame;
 	counter8 c8(.clk(game_clock), .reset(0), .pause(0), .reset_at(0), .count(game_frame));
 	
 	// 2d matrix storing song data
@@ -37,22 +38,31 @@ module main(
 	// 2d matrix of current pixel values
 	// 0 = OFF, 1 = ON 
 	reg [11:0] state [15:0];
-	initial state = 0;
+	reg [4:0] i;
+	initial begin
+		for (i = 0; i < 16; i = i + 1) state[i] = 16'b0;
+	end
 	
 	// Keeps track of player score, maxing out at 9,990
 	reg [16:0] score;
 	initial score = 0;
 
+	/*
 	engine(game_map, state, game_frame) //updates state by reading from game_map
 	  //Top row determined by game_map 
 	  //Subsequent rows determined by previous row
 	scorer(keys, state[bottom_row], score)
 	  //state[bottom_row] == keys ? score += 10 : score = score*/
 	
+	
 	//
 	//OUTPUT SIDE  
 	//
 	
+	// Display beat (visual metronome) via LED
+	assign LEDR = game_clock;
+	
+	// Play the note corresponding to a given keypress - even if incorrect!
 	wire tone;
 	tone_player tp1(.CLOCK_50(CLOCK_50), .keys(keys), .tone(tone));
 	assign GPIO_0[4] = tone;
