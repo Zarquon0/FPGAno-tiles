@@ -1,19 +1,20 @@
 module main(
-	input CLOCK_50, input [3:0] GPIO_0, 
-	inout [3:0] GPIO_1
+	input CLOCK_50, input [3:0] GPIO_1, 
+	inout [4:0] GPIO_0
 );
 	//
 	//INPUT SIDE
 	//
 	
 	//One hot encoded representation of which key is currently being pressed
-	reg [15:0] keys;
-	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_0[3:0]), .rows(GPIO_1[3:0]), .pad(keys));
+	wire [15:0] keys;
+	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_1[3:0]), .rows(GPIO_0[3:0]), .pad(keys));
 	
 	//
 	//INTERNALS
 	//
 	
+	/*
 	// Clock controlling game progression - 0.5 for now, perhaps this should be changed *shrug*
 	reg game_clock;
 	period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(500), .new_clk(game_clock));
@@ -46,17 +47,20 @@ module main(
 	  //Top row determined by game_map 
 	  //Subsequent rows determined by previous row
 	scorer(keys, state[bottom_row], score)
-	  //state[bottom_row] == keys ? score += 10 : score = score
+	  //state[bottom_row] == keys ? score += 10 : score = score*/
 	
 	//
 	//OUTPUT SIDE  
 	//
 	
-	tone_player(keys)
-	hex_display(score)
+	wire tone;
+	tone_player tp1(.CLOCK_50(CLOCK_50), .keys(keys), .tone(tone));
+	assign GPIO_0[4] = tone;
+	
+	/*hex_display(score)
 	display(state) //800 MHz stream
 	  //1250ns per bit  ; 0 = high 400ns, low 850ns & 1 = high 800ns, low 450ns
-	  //Reset = low >50us
+	  //Reset = low >50us*/
 
 
 endmodule
