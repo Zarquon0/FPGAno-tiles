@@ -1,5 +1,5 @@
-module counter8(
-	input clk, reset, pause, input [7:0] reset_at, 
+ module counter8(
+	input clk, reset, start, input [7:0] reset_at, 
 	output reg unsigned [7:0] count
 	);
 	
@@ -8,15 +8,15 @@ module counter8(
 	wire [7:0] reset_after;
 	assign reset_after = ((reset_at == 0) ? 255 : reset_at - 1);
 	
-	reg paused;
-	always @(posedge pause) begin
-		paused <= ~paused;
-	end
+//	reg started;
+//	always @(posedge pause) begin
+//		paused <= ~paused;
+//	end
 	
 	always @(posedge clk or posedge reset) begin
 		if (reset) count <= 0;
 		else begin
-			if (paused) count <= count;
+			if (~start) count <= 0;
 			else count <= ((count == reset_after) ? 0 : count + 1);
 		end
 	end
