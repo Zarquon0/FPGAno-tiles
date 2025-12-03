@@ -1,6 +1,7 @@
 module main(
-	input CLOCK_50, input [3:0] GPIO_1,
-	inout [35:0] GPIO_0, output [9:0] LEDR
+	input CLOCK_50, input [3:0] GPIO_1, KEY,
+	inout [35:0] GPIO_0, 
+	output [9:0] LEDR, output [6:0] HEX0, HEX1, HEX2, HEX3
 );
 	//
 	//INPUT SIDE
@@ -9,6 +10,13 @@ module main(
 	//One hot encoded representation of which key is currently being pressed
 	wire [15:0] keys; 
 	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_1[3:0]), .rows(GPIO_0[3:0]), .pad(keys));
+	
+	//NOTE: Reset and start buttons are handled in score.v
+	
+	// Pause and reset signals
+	wire reset, start;
+	assign reset = ~KEY[3];
+	assign start = (start ? 1 : ~KEY[0]);
 
 	//
 	//INTERNALS
@@ -21,7 +29,7 @@ module main(
 	// Counter keeping track of what game frame we're currently in
 	// NOTE: 8 bits, so maxes at 255
 	wire [7:0] game_frame;
-	counter8 c8(.clk(game_clock), .reset(0), .pause(0), 
+	counter8 c8(.clk(game_clock), .reset(reset), .pause(~running), 
 		.reset_at(11), //reset_at should be set to the LENGTH of the song being played
 		.count(game_frame));
 	
@@ -44,10 +52,11 @@ module main(
 		);
 		
 	// Scorer
+	wire running;
 	assign correct_key_pressed = (keys[11:0] == curr_note);
-	/*scorer(keys, state[bottom_row], score)
-	  //state[bottom_row] == keys ? score += 10 : score = score*/
-	
+	score(.game_clock(game_clock), .correct_key_pressed(correct_key_pressed), .CLOCK_50(CLOCK_50),
+		.KEY(KEY), .running(running), .HEX0(HEX0), .HEX1(HEX1), .HEX2(HEX2), .HEX3(HEX3), .HEX4(HEX4), .HEX5(HEX5)
+		);
 	
 	//
 	//OUTPUT SIDE  
@@ -69,11 +78,6 @@ module main(
 	tone_player tp1(.CLOCK_50(CLOCK_50), .keys(keys), .tone(tone));
 	assign GPIO_0[4] = tone;
 
-	
-	/*hex_display(score)
-	display(state) //800 MHz stream
-	  //1250ns per bit  ; 0 = high 400ns, low 850ns & 1 = high 800ns, low 450ns
-	  //Reset = low >50us*/
-
+	// NOTE: Score display is taken care of inside of score.v
 
 endmodule
