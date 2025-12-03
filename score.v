@@ -5,6 +5,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 	output reg running;
 	output [6:0] HEX0,HEX1,HEX2,HEX3,HEX4,HEX5;
 	reg [3:0] meta_key,final_key,final_key_prev;
+    //initialize all 
 	initial
 	begin
 		running = 0;
@@ -13,6 +14,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 		score_hundreds=0;
 		score_thousands=0;
 	end
+
 	// synchronize start and reset
 	always @(posedge CLOCK_50)
 	begin
@@ -21,7 +23,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 		final_key_prev <= final_key;
 	end
 
-
+    //set up start and reset 
 	//Check and Add scores every middle of beat if correct key is pressed.
 	always @(negedge game_clock || posedge final_key[3])
 	begin
@@ -36,7 +38,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 		end
 		//Start
 		else if (~final_key[0] && final_key_prev[0]) running<=1;   //whenever running is 0 just go back to first state (as reset)
-		
+		//update score
 		else if(correct_key_pressed) 
 		begin	
 			if(score_tens ==9)
@@ -51,7 +53,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 			end
 			else score_tens<=score_tens+1;
 		end
-
+        //when wrong key is pressed and reset is not pressed keep scores the same (no pause so start will start once and pressing again will not do anything)
 		else 
 		begin 
 			score_units <= score_units;
@@ -62,7 +64,7 @@ module score(game_clock,correct_key_pressed,KEY,CLOCK_50, score_units,score_tens
 	end
 
 
-	
+	//to display each score digit in the hex displays 
 q6 display_units (
 		.SW(score_units),
 		.HEX0(HEX0)
