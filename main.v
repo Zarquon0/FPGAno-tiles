@@ -1,16 +1,15 @@
 module main(
-	input CLOCK_50, output [9:0] GPIO_1, //input [3:0] GPIO_1, SW,
-	//inout [4:0] GPIO_0,
-	output [9:0] LEDR
+	input CLOCK_50, input [3:0] GPIO_1,
+	inout [35:0] GPIO_0, output [9:0] LEDR
 );
 	//
 	//INPUT SIDE
 	//
 	
 	//One hot encoded representation of which key is currently being pressed
-//	wire [15:0] keys;
-//	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_1[3:0]), .rows(GPIO_0[3:0]), .pad(keys));
-	
+	wire [15:0] keys; 
+	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_1[3:0]), .rows(GPIO_0[3:0]), .pad(keys));
+
 	//
 	//INTERNALS
 	//
@@ -43,6 +42,9 @@ module main(
 		.game_frame(game_frame), .game_clock(game_clock),
 		.curr_note(curr_note), .next_note(next_note), .hold_length(hold_length)
 		);
+		
+	// Scorer
+	assign correct_key_pressed = (keys[11:0] == curr_note);
 	/*scorer(keys, state[bottom_row], score)
 	  //state[bottom_row] == keys ? score += 10 : score = score*/
 	
@@ -59,12 +61,13 @@ module main(
 	assign LEDR[7:0] = ((1 << hold_length) - 1);
 	
 	// Display notes
-	assign GPIO_1[9:0] = curr_note[9:0];
+	assign GPIO_0[21:10] = curr_note[11:0];
+	assign GPIO_0[35:24] = next_note[11:0];
 	
 	// Play the note corresponding to a given keypress - even if incorrect!
-//	wire tone;
-//	tone_player tp1(.CLOCK_50(CLOCK_50), .keys(keys), .tone(tone));
-//	assign GPIO_0[4] = tone;
+	wire tone;
+	tone_player tp1(.CLOCK_50(CLOCK_50), .keys(keys), .tone(tone));
+	assign GPIO_0[4] = tone;
 
 	
 	/*hex_display(score)
