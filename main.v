@@ -3,6 +3,14 @@ module main(
 	inout [35:0] GPIO_0, 
 	output [9:0] LEDR, output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5
 );
+
+	//HYPER PARAMETERS
+	
+	wire [19:0] game_period;
+	wire [7:0] game_length;
+	assign game_period = 500; //In milliseconds
+	assign game_length = 66;//64; //Dependent on song being played
+	
 	//
 	//INPUT SIDE
 	//
@@ -25,16 +33,15 @@ module main(
 	//INTERNALS
 	//
 	
-	// Clock controlling game progression - 0.5 for now, perhaps this should be changed *shrug*
+	// Clock controlling game progression
 	wire game_clock;
-	period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(1000), .new_clk(game_clock)); 
+	period_gen pg1(.CLOCK_50(CLOCK_50), .t_ms(game_period), .new_clk(game_clock)); 
 
 	// Counter keeping track of what game frame we're currently in
 	// NOTE: 8 bits, so maxes at 255
 	wire [7:0] game_frame;
 	counter8 c8(.clk(game_clock), .reset(reset), .start(start), 
-		.stop_at(52), //stop_at should be set to the LENGTH of the song being played
-		.count(game_frame));
+		.stop_at(game_length), .count(game_frame));
 	
 	// Game state objects (downstream of game_frame
 	// curr_note = one hot encoded representation of current note, next_note = same thing for next note
@@ -56,7 +63,7 @@ module main(
 		
 	// Scorer
 	wire correct_key_pressed;
-	assign correct_key_pressed = (keys[11:0] == curr_note);
+	assign correct_key_pressed = ((keys[11:0] == curr_note) && start && (game_frame != game_length - 1));
 	score s(.game_clock(game_clock), .correct_key_pressed(correct_key_pressed), .CLOCK_50(CLOCK_50),
 		  .start(start), .reset(reset), .HEX0(HEX0), .HEX1(HEX1), .HEX2(HEX2), .HEX3(HEX3), .HEX4(HEX4), .HEX5(HEX5)
 		);

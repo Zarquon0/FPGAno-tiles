@@ -7,7 +7,7 @@ module engine(
 	// Row = one note
 	// 8 bit : ****---- : * = note identifier, - = how long
 	// Array size is 42 notes (Indices 0 to 41)
-	reg [7:0] game_map [45:0];
+	/*reg [7:0] game_map [45:0];
 	initial begin
 		// --- INTRO RESTS ---
 		game_map[0]  = {4'd15, 4'd1}; // Rest (1 beat)
@@ -70,6 +70,60 @@ module engine(
 		// --- OUTRO RESTS ---
 		game_map[44] = {4'd15, 4'd1}; // Rest (1 beat)
 		game_map[45] = {4'd15, 4'd1}; // Rest (1 beat)
+	end*/
+	reg [7:0] game_map [41:0];
+	initial begin
+		// --- INTRO RESTS (2 Beats) ---
+		game_map[0]  = {4'd15, 4'd1}; // Rest
+		game_map[1]  = {4'd15, 4'd1}; // Rest
+
+		// --- SECTION A ("Dum da-da-da dum...") ---
+		game_map[2]  = {4'd7, 4'd2};  // E
+		game_map[3]  = {4'd2, 4'd1};  // B
+		game_map[4]  = {4'd3, 4'd1};  // C
+		game_map[5]  = {4'd5, 4'd2};  // D
+		game_map[6]  = {4'd3, 4'd1};  // C
+		game_map[7]  = {4'd2, 4'd1};  // B
+		game_map[8]  = {4'd0, 4'd2};  // A
+		game_map[9]  = {4'd0, 4'd1};  // A
+		game_map[10] = {4'd3, 4'd1};  // C
+		game_map[11] = {4'd7, 4'd2};  // E
+		game_map[12] = {4'd5, 4'd1};  // D
+		game_map[13] = {4'd3, 4'd1};  // C
+		game_map[14] = {4'd2, 4'd3};  // B (Held longer)
+		game_map[15] = {4'd3, 4'd1};  // C
+		game_map[16] = {4'd5, 4'd2};  // D
+		game_map[17] = {4'd7, 4'd2};  // E
+		game_map[18] = {4'd3, 4'd2};  // C
+		game_map[19] = {4'd0, 4'd2};  // A
+		game_map[20] = {4'd0, 4'd2};  // A
+		
+		// ** NEW REST ADDED HERE **
+		game_map[21] = {4'd15, 4'd2}; // Rest (Quarter note)
+
+		// --- SECTION B ("Da-da-da Dum...") ---
+		game_map[22] = {4'd5, 4'd2};  // D
+		game_map[23] = {4'd5, 4'd1};  // D
+		game_map[24] = {4'd8, 4'd1};  // F
+		game_map[25] = {4'd10, 4'd2}; // G (Substituted for High A)
+		game_map[26] = {4'd10, 4'd1}; // G
+		game_map[27] = {4'd8, 4'd1};  // F
+		game_map[28] = {4'd7, 4'd2};  // E
+		game_map[29] = {4'd3, 4'd1};  // C
+		game_map[30] = {4'd7, 4'd1};  // E
+		game_map[31] = {4'd5, 4'd2};  // D
+		game_map[32] = {4'd3, 4'd1};  // C
+		game_map[33] = {4'd2, 4'd1};  // B
+		game_map[34] = {4'd2, 4'd3};  // B (Held longer)
+		game_map[35] = {4'd3, 4'd1};  // C
+		game_map[36] = {4'd5, 4'd2};  // D
+		game_map[37] = {4'd7, 4'd2};  // E
+		game_map[38] = {4'd3, 4'd2};  // C
+		game_map[39] = {4'd0, 4'd2};  // A
+		game_map[40] = {4'd0, 4'd2};  // A
+
+		// --- OUTRO RESTS (2 Beats) ---
+		game_map[41] = {4'd15, 4'd2}; // Rest
 	end
 
 	reg unsigned [7:0] index, past_beats;

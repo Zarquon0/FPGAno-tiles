@@ -8,3 +8,5 @@ c5_pin_model_dump.txt
 *.qpf
 *.qw
 *.qws
+*.rpt
+*.qarlog
