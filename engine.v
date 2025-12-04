@@ -9,7 +9,7 @@ module engine(
 	reg [7:0] game_map [3:0];
 	initial begin
 		game_map[0] = {4'd0, 4'd2};
-		game_map[1] = {4'd2, 4'd3};
+		game_map[1] = {4'd2, 4'd3};              
 		game_map[2] = {4'd8, 4'd2};
 		game_map[3] = {4'd6, 4'd4};
 	end

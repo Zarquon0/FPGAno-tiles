@@ -1,7 +1,7 @@
 module main(
 	input CLOCK_50, input [3:0] GPIO_1, KEY,
 	inout [35:0] GPIO_0, 
-	output [9:0] LEDR, output [6:0] HEX0, HEX1, HEX2, HEX3
+	output [9:0] LEDR, output [6:0] HEX0, HEX1, HEX2, HEX3, HEX4, HEX5
 );
 	//
 	//INPUT SIDE
@@ -14,9 +14,14 @@ module main(
 	//NOTE: Reset and start buttons are handled in score.v
 	
 	// Pause and reset signals
-	wire reset, start;
+	wire reset;
+	reg start;
+	initial start = 0;
 	assign reset = ~KEY[3];
-	assign start = (start ? 1 : ~KEY[0]);
+	always @(negedge KEY[0] or posedge reset) begin
+		if (reset) start <= 0;
+		else start <= 1; 
+	end
 
 	//
 	//INTERNALS
@@ -52,10 +57,10 @@ module main(
 		);
 		
 	// Scorer
-	wire running;
+	wire correct_key_pressed;
 	assign correct_key_pressed = (keys[11:0] == curr_note);
-	score(.game_clock(game_clock), .correct_key_pressed(correct_key_pressed), .CLOCK_50(CLOCK_50),
-		.KEY(KEY), .running(running), .HEX0(HEX0), .HEX1(HEX1), .HEX2(HEX2), .HEX3(HEX3), .HEX4(HEX4), .HEX5(HEX5)
+	score s(.game_clock(game_clock), .correct_key_pressed(correct_key_pressed), .CLOCK_50(CLOCK_50),
+		  .start(start), .reset(reset), .HEX0(HEX0), .HEX1(HEX1), .HEX2(HEX2), .HEX3(HEX3), .HEX4(HEX4), .HEX5(HEX5)
 		);
 	
 	//

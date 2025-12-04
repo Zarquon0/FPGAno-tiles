@@ -1,13 +1,11 @@
-module score(game_clock,correct_key_pressed,CLOCK_50,running,HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,start,reset);
+module score(game_clock,correct_key_pressed,CLOCK_50,HEX0,HEX1,HEX2,HEX3,HEX4,HEX5,start,reset);
    input game_clock,correct_key_pressed,CLOCK_50;
    input start,reset;
 	reg [3:0] score_units,score_tens,score_hundreds,score_thousands;
-	output reg running;
 	output [6:0] HEX0,HEX1,HEX2,HEX3,HEX4,HEX5;
     //initialize all 
 	initial
 	begin
-		running = 0;
 		score_units=0;
 		score_tens=0;
 		score_hundreds=0;
@@ -17,7 +15,7 @@ module score(game_clock,correct_key_pressed,CLOCK_50,running,HEX0,HEX1,HEX2,HEX3
 
 
 	//Check and Add scores every middle of beat if correct key is pressed.
-	always @(negedge game_clock or negedge reset)
+	always @(negedge game_clock or posedge reset)
 	begin
 		//Reset
 		if (reset) 
@@ -26,13 +24,12 @@ module score(game_clock,correct_key_pressed,CLOCK_50,running,HEX0,HEX1,HEX2,HEX3
 			score_hundreds<=0;
 			score_tens<=0;
 			score_units<=0;
-			running<=0;
 		end
 		else begin
 			//Start
-			if (start) running<=1;   //whenever running is 0 just go back to first state (as reset)
+			//if (start) running<=1;   //whenever running is 0 just go back to first state (as reset)
 			//update score
-			else if(correct_key_pressed) 
+			if(correct_key_pressed) 
 			begin	
 				if(score_tens ==9)
 				begin	
