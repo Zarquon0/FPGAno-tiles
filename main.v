@@ -11,9 +11,7 @@ module main(
 	wire [15:0] keys; 
 	read_keyboard rk1(.CLOCK_50(CLOCK_50), .cols(GPIO_1[3:0]), .rows(GPIO_0[3:0]), .pad(keys));
 	
-	//NOTE: Reset and start buttons are handled in score.v
-	
-	// Pause and reset signals
+	// Start and reset signals
 	wire reset;
 	reg start;
 	initial start = 0;
@@ -35,7 +33,7 @@ module main(
 	// NOTE: 8 bits, so maxes at 255
 	wire [7:0] game_frame;
 	counter8 c8(.clk(game_clock), .reset(reset), .start(start), 
-		.reset_at(11), //reset_at should be set to the LENGTH of the song being played
+		.stop_at(11), //stop_at should be set to the LENGTH of the song being played
 		.count(game_frame));
 	
 	// Game state objects (downstream of game_frame
