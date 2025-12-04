@@ -33,7 +33,7 @@ module main(
 	// NOTE: 8 bits, so maxes at 255
 	wire [7:0] game_frame;
 	counter8 c8(.clk(game_clock), .reset(reset), .start(start), 
-		.stop_at(11), //stop_at should be set to the LENGTH of the song being played
+		.stop_at(52), //stop_at should be set to the LENGTH of the song being played
 		.count(game_frame));
 	
 	// Game state objects (downstream of game_frame
